@@ -1,14 +1,14 @@
-function Create3DPolygon(n=36, sdistance=5, r=5, planes=12) {
+function Create3DPolygon(n=36, planes=12) {
     let x = 1, swrapper = document.querySelector('.sphere-wrapper'), rotationX = 0, rotationY = 0;
     while (x <= planes) {
       let plane = document.createElement('div');
-      plane.className = `plane`;
+      plane.classList.add("plane");
       plane.style.transform = `rotateY(${x * 15}deg)`;
       swrapper.appendChild(plane);
       for (y = 1; y <= n; y++) {
         let spoke = document.createElement('div');
-        spoke.className = `spoke`;
-        spoke.innerHTML = ` <div class="dot"></div>`;
+        spoke.classList.add("spoke");
+        spoke.innerHTML = `<div class="dot"></div>`;
         spoke.style.transform = `rotateZ(${y}0deg)`;
         plane.appendChild(spoke);
       }
