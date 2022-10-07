@@ -31,12 +31,12 @@ function Create3DPolygon(n=36, planes=12) {
         updatePosition() {
             this.time -= this.speed
 
-            this.θ = 2 * Math.PI * this.u + this.time
-            this.φ  = Math.acos(2 * this.v - 1) - Math.PI * 0.5
+            this.theta = 2 * Math.PI * this.u + this.time
+            this.phi  = Math.acos(2 * this.v - 1) - Math.PI * 0.5
 
-            this.x = this.radius * Math.sin(this.θ) * Math.cos(this.φ)
-            this.y = this.radius * Math.sin(this.φ)
-            this.z = this.radius * Math.cos(this.φ) * Math.cos(this.θ)
+            this.x = this.radius * Math.sin(this.theta) * Math.cos(this.phi)
+            this.y = this.radius * Math.sin(this.phi)
+            this.z = this.radius * Math.cos(this.phi) * Math.cos(this.theta)
 
             this.size = (this.radius * 1.4 - this.z) / 25
         }
