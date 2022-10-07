@@ -32,10 +32,6 @@ function Create3DPolygon(n=36, planes=12) {
             this.time -= this.speed
 
             this.θ = 2 * Math.PI * this.u + this.time
-            // Incorrectly distributed
-            // this.φ = Math.PI * (this.v - 0.5)
-            
-            // Correctly distributed
             this.φ  = Math.acos(2 * this.v - 1) - Math.PI * 0.5
 
             this.x = this.radius * Math.sin(this.θ) * Math.cos(this.φ)
@@ -87,21 +83,8 @@ function Create3DPolygon(n=36, planes=12) {
     }
 
     void function loop() {
-
         sctx.fillStyle = `rgba(${ bgColor }, ${ bgOpacity })`
         sctx.fillRect(0, 0, width, height)
-
-        // sctx.beginPath()
-        // sctx.moveTo(hWidth, hHeight)
-        // for (let i = 0; i < numOfParticles; i++) {
-        //   const { x, y } = staticParticles[i].data
-
-        //   sctx.lineTo(x + hWidth, y + hHeight)
-        //   sctx.moveTo(hWidth, hHeight)
-        // }
-        // sctx.strokeStyle = `rgba(15, 17, 10, ${ bgOpacity - 0.1 })`
-        // sctx.closePath()
-        // sctx.stroke()
 
     for (let i = 0; i < numOfParticles; i++) {
         staticParticles[i].updatePosition()
