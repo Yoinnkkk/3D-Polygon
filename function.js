@@ -1,35 +1,115 @@
 function Create3DPolygon(n=36, planes=12) {
-    let x = 1, swrapper = document.querySelector('.sphere-wrapper'), rotationX = 0, rotationY = 0;
-    while (x <= planes) {
-      let plane = document.createElement('div');
-      plane.classList.add("plane");
-      plane.style.transform = `rotateY(${x * 15}deg)`;
-      swrapper.appendChild(plane);
-      for (y = 1; y <= n; y++) {
-        let spoke = document.createElement('div');
-        spoke.classList.add("spoke");
-        spoke.innerHTML = `<div class="dot"></div>`;
-        spoke.style.transform = `rotateZ(${y}0deg)`;
-        plane.appendChild(spoke);
-      }
-      x++;
-    }
-    swrapper.parentElement.onmousedown = function(event){catchmousedown(event)}
-    function catchmousedown(event) {
-        pos3 = event.pageX, pos4 = event.pageY;
-        document.onmousemove = function(event){catchmousemove(event)}
-        document.onmouseup = function(){
-            document.onmousemove = null;
-            document.onmouseup = null;
+    const canvas = document.getElementById('canvas')
+    const sctx = canvas.getContext('2d', { alpha: true })
+
+    const radius = 400
+    const width = radius * 2.5
+    const height = width
+    const hWidth = width / 2
+    const hHeight = height / 2
+    const numOfParticles = 200
+    const staticParticles = []
+    const bgColor = '15, 17, 26'
+    const defaultPartSpeed = 0.0025
+
+    let bgOpacity = 1
+
+    canvas.width = width
+    canvas.height = height
+
+    class Particle {
+        constructor(isRandomRadius) {
+            this.radius = isRandomRadius ? Math.random() * radius : radius
+            this.time = 0
+            this.speed = isRandomRadius ? Math.random() / 200 : defaultPartSpeed
+            this.hue = 110 + 100 * Math.random()
+            this.u = Math.random()
+            this.v = Math.random()
+            this.updatePosition()
+        }
+
+        updatePosition() {
+            this.time -= this.speed
+
+            this.θ = 2 * Math.PI * this.u + this.time
+            // Incorrectly distributed
+            // this.φ = Math.PI * (this.v - 0.5)
+            
+            // Correctly distributed
+            this.φ  = Math.acos(2 * this.v - 1) - Math.PI * 0.5
+
+            this.x = this.radius * Math.sin(this.θ) * Math.cos(this.φ)
+            this.y = this.radius * Math.sin(this.φ)
+            this.z = this.radius * Math.cos(this.φ) * Math.cos(this.θ)
+
+            this.size = (this.radius * 1.4 - this.z) / 25
+        }
+
+        getColor(ctx) {
+            const x = this.x + hWidth
+            const y = this.y + hHeight
+        
+            const gradient = ctx.createRadialGradient(x, y, 0, x, y, this.size)
+        
+            gradient.addColorStop(0, `hsla(${ this.hue }, 100%, 60%, 1)`)
+            gradient.addColorStop(.3, `hsla(${ this.hue }, 100%, 60%, 0)`)
+            gradient.addColorStop(1, `hsla(${ this.hue }, 100%, 60%, 0)`)
+        
+            return gradient
+        }
+
+        render(ctx) {
+            const hSize = this.size / 2
+
+            ctx.fillStyle = this.getColor(ctx)
+
+            ctx.fillRect(
+            hWidth + this.x - hSize,
+            hHeight + this.y - hSize,
+            this.size,
+            this.size
+            )
+        }
+
+        get data() {
+            return {
+            x: this.x,
+            y: this.y,
+            z: this.z,
+            size: this.size,
+            color: `hsla(${ this.hue }, 100%, 60%, 1)`
+            }
         }
     }
-    function catchmousemove(event) {
-        pos1 = pos3 - event.pageX, pos2 = pos4 - event.pageY, pos3 = event.pageX, pos4 = event.pageY;
-        rotationX = rotationX + (Math.atan2(pos2, 300) * 180 / Math.PI)
-        rotationY = rotationY - (Math.atan2(pos1, 500) * 180 / Math.PI)
-        swrapper.style.transform = `rotateX(${rotationX}deg)`
-        swrapper.style.transform += `rotateY(${rotationY}deg)`
+
+    for (let i = 0; i < numOfParticles; i++) {
+        staticParticles.push(new Particle(false))
     }
+
+    void function loop() {
+
+        sctx.fillStyle = `rgba(${ bgColor }, ${ bgOpacity })`
+        sctx.fillRect(0, 0, width, height)
+
+        // sctx.beginPath()
+        // sctx.moveTo(hWidth, hHeight)
+        // for (let i = 0; i < numOfParticles; i++) {
+        //   const { x, y } = staticParticles[i].data
+
+        //   sctx.lineTo(x + hWidth, y + hHeight)
+        //   sctx.moveTo(hWidth, hHeight)
+        // }
+        // sctx.strokeStyle = `rgba(15, 17, 10, ${ bgOpacity - 0.1 })`
+        // sctx.closePath()
+        // sctx.stroke()
+
+    for (let i = 0; i < numOfParticles; i++) {
+        staticParticles[i].updatePosition()
+        staticParticles[i].render(sctx)
+    }
+
+    window.requestAnimationFrame(loop)
+    }()
 }
 
 window.addEventListener('load', function () {
